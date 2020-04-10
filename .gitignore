@@ -1,0 +1,10 @@
+#VSCode files
+.vscode
+
+#Firestore credentials file
+db.json
+
+#Go dependencies
+vendor
+go.sum
+
