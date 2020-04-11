@@ -21,7 +21,7 @@ type Post struct {
 	Description string    `json:"description" firestore:"description"`
 	Image       string    `json:"image" firestore:"image"`
 	URL         string    `json:"url" firestore:"url"`
-	Date        time.Time `firestore:"date"`
+	Date        time.Time `json:"date" firestore:"date"`
 }
 
 //SavePost calls Link Preview service using provided URL to start details about the link to the database
@@ -60,7 +60,7 @@ func SavePost(w http.ResponseWriter, r *http.Request) {
 
 	//Proceed with returning response if no errors encountered
 	json.NewEncoder(w).Encode(result)
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusCreated)
 }
 
 //callLinkPreview helper function that calls and returns response from Link Preview service
