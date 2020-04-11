@@ -13,6 +13,7 @@ import (
 
 //FindPosts returns all the posts available
 func FindPosts(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Content-Type", "application/json")
 	ctx := r.Context()
 	projectID := os.Getenv("PROJECT_ID")
