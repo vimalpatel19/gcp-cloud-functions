@@ -46,7 +46,7 @@ func getPosts(ctx context.Context, projectID, collectionName string) ([]Post, er
 	defer dbClient.Close()
 
 	//Call database to retrieve all posts
-	iter := dbClient.Collection(collectionName).Documents(ctx)
+	iter := dbClient.Collection(collectionName).OrderBy("date", firestore.Desc).Documents(ctx)
 
 	//Iterate through the list of posts returned
 	for {
