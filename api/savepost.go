@@ -15,15 +15,6 @@ const (
 	linkPreviewService = "http://api.linkpreview.net"
 )
 
-//Post structure of document inserted into the Firestore database
-type Post struct {
-	Title       string    `json:"title" firestore:"title"`
-	Description string    `json:"description" firestore:"description"`
-	Image       string    `json:"image" firestore:"image"`
-	URL         string    `json:"url" firestore:"url"`
-	Date        time.Time `json:"date" firestore:"date"`
-}
-
 //SavePost calls Link Preview service using provided URL to start details about the link to the database
 func SavePost(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
@@ -40,8 +31,11 @@ func SavePost(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+	//TODO: Retrieve new optional parameter
 
 	link := keys[0]
+
+	//TODO: Only call link preview service if not a manual save post request
 
 	//Call link preview service
 	result, err := callLinkPreview(link, linkPreviewKey)
@@ -49,6 +43,8 @@ func SavePost(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+
+	//TODO: Otherwise populate with request body
 
 	//Insert the result/post into the database
 	result.Date = time.Now()

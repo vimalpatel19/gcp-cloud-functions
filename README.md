@@ -12,7 +12,7 @@ The functions created under the `api` directory can be run locally by running th
 ### Deploying
 - HTTP tigger functions can be executed by running the following CLI command:
 ```
-gcloud functions deploy <FUNCTION_NAME> --entry-point <METHOD_NAME> --runtime go113 --trigger-http --set-env-vars <ENV1=VALUE1,ENV2=VALUE2,...>
+gcloud functions deploy <FUNCTION_NAME> --entry-point <METHOD_NAME> --runtime go113 --trigger-http --env-vars-file <JSON_FILE_CONTAINING_FIRESTORE_CREDENTIALS_AND_ENVIRONMENT_VARIABLES>
 ```
 
 ### TODO

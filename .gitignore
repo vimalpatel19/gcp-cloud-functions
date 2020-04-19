@@ -2,7 +2,7 @@
 .vscode
 
 #Firestore credentials file
-db.json
+env.json
 
 #Go dependencies
 vendor
