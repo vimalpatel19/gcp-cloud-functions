@@ -1,14 +1,11 @@
 package api
 
 import (
-	"context"
 	"encoding/json"
 	"log"
 	"net/http"
 	"os"
 	"time"
-
-	"cloud.google.com/go/firestore"
 )
 
 const (
@@ -24,18 +21,12 @@ func SavePost(w http.ResponseWriter, r *http.Request) {
 	collectionName := os.Getenv("COLLECTION_NAME")
 
 	//Verify the 'link' parameter has been provided as a request parameter
-	keys, ok := r.URL.Query()["link"]
-	if !ok || len(keys[0]) < 1 {
-		log.Println("URL parameter 'link' not provided")
-
+	link := GetURLParameter(r, "link")
+	if link == "" {
+		log.Println("Invalid value provided for 'link' parameter")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	//TODO: Retrieve new optional parameter
-
-	link := keys[0]
-
-	//TODO: Only call link preview service if not a manual save post request
 
 	//Call link preview service
 	result, err := callLinkPreview(link, linkPreviewKey)
@@ -44,12 +35,23 @@ func SavePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//TODO: Otherwise populate with request body
+	//Connect to the database
+	db, err := ConnectToDatabase(ctx, projectID)
+	defer db.Client.Close()
+
+	if err != nil {
+		log.Println("Error connecting to database:", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
 	//Insert the result/post into the database
 	result.Date = time.Now()
-	err = insertPost(ctx, result, projectID, collectionName)
+	result.Likes = 0
+	err = db.InsertPost(ctx, result, collectionName)
+
 	if err != nil {
+		log.Println("Error inserting post into the database:", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -86,26 +88,4 @@ func callLinkPreview(link, key string) (Post, error) {
 	//Decode the response body
 	json.NewDecoder(resp.Body).Decode(&result)
 	return result, nil
-}
-
-//insertPost helper function that connects to and stores link/post details into Firestore database
-func insertPost(ctx context.Context, post Post, projectID, collectionName string) error {
-	//Connect to the database
-	dbClient, err := firestore.NewClient(ctx, projectID)
-
-	if err != nil {
-		log.Println("Error connecting to database:", err)
-		return err
-	}
-	defer dbClient.Close()
-
-	//Add post to the database
-	_, _, err = dbClient.Collection(collectionName).Add(ctx, post)
-
-	if err != nil {
-		log.Println("Error saving document to the database:", err)
-		return err
-	}
-
-	return nil
 }

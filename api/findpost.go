@@ -44,6 +44,7 @@ func FindPosts(w http.ResponseWriter, r *http.Request) {
 
 	//Connect to the database
 	db, err := ConnectToDatabase(ctx, projectID)
+	defer db.Client.Close()
 
 	if err != nil {
 		log.Println("Error connecting to database:", err)
